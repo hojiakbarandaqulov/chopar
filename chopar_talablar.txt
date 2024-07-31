@@ -1,0 +1,135 @@
+******************* Chopar *******************
+1. Profile
+    id(uuid),name, phone or email(un, not null), password, status,role,visible,created_date, birthDate(not null)
+2. product
+    id,name_uz, name_ru,visible,created_date, description_uz,description_ru, price, discountPrice, prtId, rating, view_count, category_id
+
+3. Attach
+    id (uuid or string), original_name, path, size, extension, created_date, url
+4. ProductAttach
+   id, product_id, attach_id, created_date
+
+5. Region(not necessary)
+    id,order_number,name_uz, name_ru, name_en,visible,created_date
+6. Category
+    id,name_uz, name_ru,visible,created_date, prtId, order_number
+7. SmsHistory (all send sms from system)
+    id, phone,message,status,created_date
+    status - NEW,USED  (when sms used  after sending to phone the sms status should be changed to USED.)
+8. EmailHistory
+    id, message, email, created_data
+9. order
+   id, profile_id,amount (total-amount), created_date, status(delivered, cancelled, on the way, preparing), delivered_address, delivered_contact
+10. order_busket
+	id,product_id,order_id, amount, price, created_date
+	
+
+* Language enum (en,uz,ru)
+* ProfileRole (USER,ADMIN)
+* ProfileStatus (ACTIVE,NOT_ACTIVE)
+* OrderStatus
+* SmsStatus
+
+*** API list ***
+1.  Authorization
+       1. Registration (only USER)
+            (name,surname,login/email/phone,password) + validation. password with MD5 encode.
+       2. Login
+            (email/phone,password)
+       3. Verification
+            (phone -> code) or (mail -> link)
+            (should by limit for verification time)
+       4. Resent
+            (phone ->  code) or (mail -> link)
+            (should by limit for verification time)
+2. Profile
+    1. Create profile (name,phone,status,birthdate) (role will be ADMIN)
+    2. Update Profile (ADMIN)
+    3. Update Profile Detail (ANY) (Profile updates own details)
+    4. Profile List (ADMIN) (Pagination)
+    5. Delete Profile By Id (ADMIN)
+3. Region
+    1. Create  (ADMIN)
+        (order_number,name_uz, name_ru, name_en)
+    2. Update by id (ADMIN)
+        (id,name_uz, name_ru, name_en)
+    3. Delete by id (ADMIN)
+    4. Get List (ADMIN)
+        (id,key,name_uz, name_ru, name_en,visible,created_date)
+    5. Get By Lang (Language keladi shu language dagi name larini berib yuboramiz)
+        (id,name) (name ga tegishli name_.. dagi qiymat qo'yiladi.) (visible true)
+
+4. Category
+    1. Create  (ADMIN)
+        (order_number,name_uz, name_ru, name_en)
+    2. Update by id (ADMIN)
+        (order_number,name_uz, name_ru, name_en)
+    3. Delete by id (ADMIN)
+    4. Get List (ADMIN) - order by order_number
+        (id,order_number,name_uz, name_ru, name_en,visible,created_date)
+    5. Get By Lang (Language keladi shu language dagi name larini berib yuboramiz) (order by order_number)
+        (id,name) (name ga tegishli name_... dagi qiymat qo'yiladi.)
+
+5. Attach
+    1. Upload  (ANY)
+    2. Open (by id)
+    3. Open general (by id)
+    4. Download (by id  with origin name)
+    5. Pagination (ADMIN)
+    6. Delete by id (delete from system and table) (ADMIN)
+
+6. SmsHistory
+    1. Create Sms History when sms is send using application. (No need create api)
+    2. Get sms history by phone
+         (id, phone,message,status,type(if necessary),created_date)
+    3. Get sms history be given date
+         (id, phone,message,status,type(if necessary),created_date)
+    4.Pagination (ADMIN)
+         (id, phone,message,status,type(if necessary),created_date)
+
+    (!While sending should some restrictions:
+         For 1 phone 4 sms allowed during 1 minute.)
+7. EmailHistory
+    id, message, email, created_data
+    1. Create EmailHistory when email is send using application. (No need create api)
+    2. Get EmailHistory by email
+            (id, email,message,created_date)
+    3. Get EmailHistory  by given date
+            (id, email,message,created_date)
+    4. Pagination (ADMIN)
+            (id, email,message,created_date)
+
+       (!Should be limit for email sending. For 1 email 3 sms allowed during 1 minut. )
+
+8. product
+    id,order_number,name_uz, name_ru, name_en,visible,created_date, description_uz, description_ru, description_en,
+  	price, category_id
+    1. create product (order_number,name_uz, name_ru, name_en, description_uz.ru.en, price, attachlist[image_id,image_id], category_id)
+       admin page(https://demo.templatemonster.com/demo/172401.html?_gl=1*t9frl*_ga*NTkzNDY4MDc0LjE2OTY3NTg0NDQ.*_ga_FTPYEGT5LY*MTY5Njc1ODQ0NC4xLjEuMTY5Njc1ODQ1OC40Ni4wLjA.&_ga=2.142290298.974307283.1696758445-593468074.1696758444)
+    2. update  (order_number,name_uz, name_ru, name_en, description_uz.ru.en, price, attachlist[image_id,image_id], category_id)
+    3. delete(visible=false)
+    4. get pagination by categoryId and language
+		(id,name,description,price,mainImage,)
+    5. get last 10 added productList
+		(id,name,description,price,mainImage,)
+	6. gat top selled 10 products
+		(id,name,description,price,mainImage,)
+	9. Get by Id as client
+		(id,name,description,price,attachList,)
+	10. Get by Id as admin
+		(id, name_uz, name_ru, name_en,visible,created_date, description_uz, description_ru, description_en, price, category_id,  attachlist[])
+
+9. order
+   1. create (product_list(product_id,amount), profile_id (from jwt),  delivered_address, delivered_contact).  ( status will be preparing)
+   2. cancel by id. status to cnacel.  only for admin.
+   3. cancel order by id for client. Bunda orderId mujojat qilgan profile ga tegishli bo'lishi kerak. order ning statusi  preparing bo'lsa ruxsat berilsin.  
+   3. delivered. status to deliverd. only for admin.
+   4. cancelled. status to cancelled. only for admin.
+   5. on_the_way. status to on_the_way. only for admin.
+   3. update (product_list(product_id...), profile_id (from jwt),  delivered_address, delivered_contact). If status is preparing. 
+		other wise not allow.
+   4. Get by id. Bunda shu orderga kirgan barcha productlarni ham qo'shib return qiladi.  		
+   4. get all by order list for client. (Murojat qilgan client ning order listini retunr qiladi. Orderni productlarini emas.) 
+		with pagination.
+   5. filter with pagination. filter items order_date, order status, profile-id, product-id. Only for admin. 
+
