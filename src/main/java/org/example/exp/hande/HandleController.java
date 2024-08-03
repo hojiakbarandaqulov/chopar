@@ -1,6 +1,5 @@
 package org.example.exp.hande;
 
-import org.example.dto.ApiResponse;
 import org.example.exp.AppBadException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

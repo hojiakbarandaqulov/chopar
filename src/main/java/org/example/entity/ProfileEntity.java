@@ -8,13 +8,15 @@ import org.example.enums.ProfileStatus;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @Entity
 @Table(name = "profile")
-public class ProfileEntity extends BaseEntity{
+public class ProfileEntity {
+    @Id
+    @GeneratedValue(generator = "uuid-hibernate-generator")
+    @GenericGenerator(name = "uuid-hibernate-generator", strategy = "org.hibernate.id.UUIDGenerator")
+    private String id;
 
     @Column(name = "name", unique = true)
     private String name;
@@ -37,8 +39,8 @@ public class ProfileEntity extends BaseEntity{
     private Boolean visible = Boolean.TRUE;
 
     @Column(name = "created_date")
-    private LocalDateTime createdDate;
+    private LocalDate createdDate;
 
     @Column(name = "birth_date")
-    private LocalDateTime birthDate;
+    private LocalDate birthDate;
 }
